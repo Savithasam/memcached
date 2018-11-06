@@ -162,18 +162,6 @@ extern DB *dbp;
 
 extern int daemon_quit;
 
-/* item management */
-void item_init(void);
-item *do_item_from_freelist(void);
-int do_item_add_to_freelist(item *it);
-item *item_alloc1(char *key, const size_t nkey, const int flags, const int nbytes);
-item *item_alloc2(size_t ntotal);
-//int item_free(item *it);
-//item *item_get(char *key, size_t nkey);
-int item_put(char *key, size_t nkey, item *it);
-int item_delete(char *key, size_t nkey);
-int item_exists(char *key, size_t nkey);
-item *item_cget(DBC *cursorp, char *start, size_t nstart, u_int32_t flags);
 
 
 /** End of bdb changes */
@@ -920,3 +908,17 @@ extern void drop_worker_privileges(void);
 
 #define likely(x)       __builtin_expect((x),1)
 #define unlikely(x)     __builtin_expect((x),0)
+
+
+/*item_bdb headers*/
+void item_init_bdb(void);
+item *do_item_from_freelist_bdb(void);
+int do_item_add_to_freelist_bdb(item *it);
+item *item_alloc1_bdb(char *key, const size_t nkey, const int flags, const int nbytes);
+item *item_alloc2_bdb(size_t ntotal);
+int item_free_bdb(item *it);
+item *item_get_bdb(char *key, size_t nkey);
+int item_put_bdb(char *key, size_t nkey, item *it);
+int item_delete_bdb(char *key, size_t nkey);
+int item_exists_bdb(char *key, size_t nkey);
+item *item_cget_bdb(DBC *cursorp, char *start, size_t nstart, u_int32_t flags);
