@@ -588,7 +588,6 @@ PACKAGE_URL=''
 ac_unique_file="memcached.c"
 # Factoring default headers for most tests.
 ac_includes_default="\
-#include <db.h>
 #include <stdio.h>
 #ifdef HAVE_SYS_TYPES_H
 # include <sys/types.h>

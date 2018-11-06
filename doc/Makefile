@@ -152,12 +152,12 @@ MANS = $(man_MANS)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
 am__DIST_COMMON = $(srcdir)/Makefile.in
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} /home/madhupriya/Documents/550/project/memcached-1.5.10/missing aclocal-1.15
+ACLOCAL = ${SHELL} /home/savitha/memcached/missing aclocal-1.15
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 1
-AUTOCONF = ${SHELL} /home/madhupriya/Documents/550/project/memcached-1.5.10/missing autoconf
-AUTOHEADER = ${SHELL} /home/madhupriya/Documents/550/project/memcached-1.5.10/missing autoheader
-AUTOMAKE = ${SHELL} /home/madhupriya/Documents/550/project/memcached-1.5.10/missing automake-1.15
+AUTOCONF = ${SHELL} /home/savitha/memcached/missing autoconf
+AUTOHEADER = ${SHELL} /home/savitha/memcached/missing autoheader
+AUTOMAKE = ${SHELL} /home/savitha/memcached/missing automake-1.15
 AWK = mawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
@@ -185,7 +185,7 @@ LDFLAGS =
 LIBOBJS = 
 LIBS = -levent 
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /home/madhupriya/Documents/550/project/memcached-1.5.10/missing makeinfo
+MAKEINFO = ${SHELL} /home/savitha/memcached/missing makeinfo
 MKDIR_P = /bin/mkdir -p
 OBJEXT = o
 PACKAGE = memcached
@@ -205,10 +205,10 @@ STRIP =
 VERSION = 1.5.10
 XML2RFC = no
 XSLTPROC = no
-abs_builddir = /home/madhupriya/Documents/550/project/memcached-1.5.10/doc
-abs_srcdir = /home/madhupriya/Documents/550/project/memcached-1.5.10/doc
-abs_top_builddir = /home/madhupriya/Documents/550/project/memcached-1.5.10
-abs_top_srcdir = /home/madhupriya/Documents/550/project/memcached-1.5.10
+abs_builddir = /home/savitha/memcached/doc
+abs_srcdir = /home/savitha/memcached/doc
+abs_top_builddir = /home/savitha/memcached
+abs_top_srcdir = /home/savitha/memcached
 ac_ct_CC = gcc
 am__include = include
 am__leading_dot = .
@@ -235,7 +235,7 @@ host_vendor = pc
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/madhupriya/Documents/550/project/memcached-1.5.10/install-sh
+install_sh = ${SHELL} /home/savitha/memcached/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -244,7 +244,7 @@ mandir = ${datarootdir}/man
 mkdir_p = $(MKDIR_P)
 oldincludedir = /usr/include
 pdfdir = ${docdir}
-prefix = /usr/local/memcached
+prefix = /usr/local
 program_transform_name = s,x,x,
 psdir = ${docdir}
 runstatedir = ${localstatedir}/run
@@ -500,10 +500,10 @@ uninstall-man: uninstall-man1
 
 
 protocol-binary.txt: protocol-binary.full
-	no -c /home/madhupriya/Documents/550/project/memcached-1.5.10/doc protocol-binary.full $@
+	no -c /home/savitha/memcached/doc protocol-binary.full $@
 
 protocol-binary-range.txt: protocol-binary-range.full
-	no -c /home/madhupriya/Documents/550/project/memcached-1.5.10/doc protocol-binary-range.full $@
+	no -c /home/savitha/memcached/doc protocol-binary-range.full $@
 
 protocol-binary.full: protocol-binary.xml xml2rfc/rfc2629-noinc.xsl
 	no --nonet xml2rfc/rfc2629-noinc.xsl protocol-binary.xml > $@
