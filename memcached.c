@@ -2724,101 +2724,101 @@ static void complete_nread(conn *c) {
 
 /* Destination must always be chunked */
 /* This should be part of item.c */
-static int _store_item_copy_chunks(item *d_it, item *s_it, const int len) {
-    item_chunk *dch = (item_chunk *) ITEM_schunk(d_it);
-    /* Advance dch until we find free space */
-    while (dch->size == dch->used) {
-        if (dch->next) {
-            dch = dch->next;
-        } else {
-            break;
-        }
-    }
+//static int _store_item_copy_chunks(item *d_it, item *s_it, const int len) {
+//    item_chunk *dch = (item_chunk *) ITEM_schunk(d_it);
+//    /* Advance dch until we find free space */
+//    while (dch->size == dch->used) {
+//        if (dch->next) {
+//            dch = dch->next;
+//        } else {
+//            break;
+//        }
+//    }
+//
+//    if (s_it->it_flags & ITEM_CHUNKED) {
+//        int remain = len;
+//        item_chunk *sch = (item_chunk *) ITEM_schunk(s_it);
+//        int copied = 0;
+//        /* Fills dch's to capacity, not straight copy sch in case data is
+//         * being added or removed (ie append/prepend)
+//         */
+//        while (sch && dch && remain) {
+//            assert(dch->used <= dch->size);
+//            int todo = (dch->size - dch->used < sch->used - copied)
+//                ? dch->size - dch->used : sch->used - copied;
+//            if (remain < todo)
+//                todo = remain;
+//            memcpy(dch->data + dch->used, sch->data + copied, todo);
+//            dch->used += todo;
+//            copied += todo;
+//            remain -= todo;
+//            assert(dch->used <= dch->size);
+//            if (dch->size == dch->used) {
+//                item_chunk *tch = do_item_alloc_chunk(dch, remain);
+//                if (tch) {
+//                    dch = tch;
+//                } else {
+//                    return -1;
+//                }
+//            }
+//            assert(copied <= sch->used);
+//            if (copied == sch->used) {
+//                copied = 0;
+//                sch = sch->next;
+//            }
+//        }
+//        /* assert that the destination had enough space for the source */
+//        assert(remain == 0);
+//    } else {
+//        int done = 0;
+//        /* Fill dch's via a non-chunked item. */
+//        while (len > done && dch) {
+//            int todo = (dch->size - dch->used < len - done)
+//                ? dch->size - dch->used : len - done;
+//            //assert(dch->size - dch->used != 0);
+//            memcpy(dch->data + dch->used, ITEM_data(s_it) + done, todo);
+//            done += todo;
+//            dch->used += todo;
+//            assert(dch->used <= dch->size);
+//            if (dch->size == dch->used) {
+//                item_chunk *tch = do_item_alloc_chunk(dch, len - done);
+//                if (tch) {
+//                    dch = tch;
+//                } else {
+//                    return -1;
+//                }
+//            }
+//        }
+//        assert(len == done);
+//    }
+//    return 0;
+//}
 
-    if (s_it->it_flags & ITEM_CHUNKED) {
-        int remain = len;
-        item_chunk *sch = (item_chunk *) ITEM_schunk(s_it);
-        int copied = 0;
-        /* Fills dch's to capacity, not straight copy sch in case data is
-         * being added or removed (ie append/prepend)
-         */
-        while (sch && dch && remain) {
-            assert(dch->used <= dch->size);
-            int todo = (dch->size - dch->used < sch->used - copied)
-                ? dch->size - dch->used : sch->used - copied;
-            if (remain < todo)
-                todo = remain;
-            memcpy(dch->data + dch->used, sch->data + copied, todo);
-            dch->used += todo;
-            copied += todo;
-            remain -= todo;
-            assert(dch->used <= dch->size);
-            if (dch->size == dch->used) {
-                item_chunk *tch = do_item_alloc_chunk(dch, remain);
-                if (tch) {
-                    dch = tch;
-                } else {
-                    return -1;
-                }
-            }
-            assert(copied <= sch->used);
-            if (copied == sch->used) {
-                copied = 0;
-                sch = sch->next;
-            }
-        }
-        /* assert that the destination had enough space for the source */
-        assert(remain == 0);
-    } else {
-        int done = 0;
-        /* Fill dch's via a non-chunked item. */
-        while (len > done && dch) {
-            int todo = (dch->size - dch->used < len - done)
-                ? dch->size - dch->used : len - done;
-            //assert(dch->size - dch->used != 0);
-            memcpy(dch->data + dch->used, ITEM_data(s_it) + done, todo);
-            done += todo;
-            dch->used += todo;
-            assert(dch->used <= dch->size);
-            if (dch->size == dch->used) {
-                item_chunk *tch = do_item_alloc_chunk(dch, len - done);
-                if (tch) {
-                    dch = tch;
-                } else {
-                    return -1;
-                }
-            }
-        }
-        assert(len == done);
-    }
-    return 0;
-}
-
-static int _store_item_copy_data(int comm, item *old_it, item *new_it, item *add_it) {
-    if (comm == NREAD_APPEND) {
-        if (new_it->it_flags & ITEM_CHUNKED) {
-            if (_store_item_copy_chunks(new_it, old_it, old_it->nbytes - 2) == -1 ||
-                _store_item_copy_chunks(new_it, add_it, add_it->nbytes) == -1) {
-                return -1;
-            }
-        } else {
-            memcpy(ITEM_data(new_it), ITEM_data(old_it), old_it->nbytes);
-            memcpy(ITEM_data(new_it) + old_it->nbytes - 2 /* CRLF */, ITEM_data(add_it), add_it->nbytes);
-        }
-    } else {
-        /* NREAD_PREPEND */
-        if (new_it->it_flags & ITEM_CHUNKED) {
-            if (_store_item_copy_chunks(new_it, add_it, add_it->nbytes - 2) == -1 ||
-                _store_item_copy_chunks(new_it, old_it, old_it->nbytes) == -1) {
-                return -1;
-            }
-        } else {
-            memcpy(ITEM_data(new_it), ITEM_data(add_it), add_it->nbytes);
-            memcpy(ITEM_data(new_it) + add_it->nbytes - 2 /* CRLF */, ITEM_data(old_it), old_it->nbytes);
-        }
-    }
-    return 0;
-}
+//static int _store_item_copy_data(int comm, item *old_it, item *new_it, item *add_it) {
+//    if (comm == NREAD_APPEND) {
+//        if (new_it->it_flags & ITEM_CHUNKED) {
+//            if (_store_item_copy_chunks(new_it, old_it, old_it->nbytes - 2) == -1 ||
+//                _store_item_copy_chunks(new_it, add_it, add_it->nbytes) == -1) {
+//                return -1;
+//            }
+//        } else {
+//            memcpy(ITEM_data(new_it), ITEM_data(old_it), old_it->nbytes);
+//            memcpy(ITEM_data(new_it) + old_it->nbytes - 2 /* CRLF */, ITEM_data(add_it), add_it->nbytes);
+//        }
+//    } else {
+//        /* NREAD_PREPEND */
+//        if (new_it->it_flags & ITEM_CHUNKED) {
+//            if (_store_item_copy_chunks(new_it, add_it, add_it->nbytes - 2) == -1 ||
+//                _store_item_copy_chunks(new_it, old_it, old_it->nbytes) == -1) {
+//                return -1;
+//            }
+//        } else {
+//            memcpy(ITEM_data(new_it), ITEM_data(add_it), add_it->nbytes);
+//            memcpy(ITEM_data(new_it) + add_it->nbytes - 2 /* CRLF */, ITEM_data(old_it), old_it->nbytes);
+//        }
+//    }
+//    return 0;
+//}
 
 /*
  * Stores an item in the cache according to the semantics of one of the set
@@ -2827,122 +2827,179 @@ static int _store_item_copy_data(int comm, item *old_it, item *new_it, item *add
  * Returns the state of storage.
  */
 enum store_item_type do_store_item(item *it, int comm, conn *c, const uint32_t hv) {
+//    char *key = ITEM_key(it);
+//    item *old_it = do_item_get(key, it->nkey, hv, c, DONT_UPDATE);
+//    enum store_item_type stored = NOT_STORED;
+//
+//    item *new_it = NULL;
+//    uint32_t flags;
+//
+//    if (old_it != NULL && comm == NREAD_ADD) {
+//        /* add only adds a nonexistent item, but promote to head of LRU */
+//        do_item_update(old_it);
+//    } else if (!old_it && (comm == NREAD_REPLACE
+//        || comm == NREAD_APPEND || comm == NREAD_PREPEND))
+//    {
+//        /* replace only replaces an existing value; don't store */
+//    } else if (comm == NREAD_CAS) {
+//        /* validate cas operation */
+//        if(old_it == NULL) {
+//            // LRU expired
+//            stored = NOT_FOUND;
+//            pthread_mutex_lock(&c->thread->stats.mutex);
+//            c->thread->stats.cas_misses++;
+//            pthread_mutex_unlock(&c->thread->stats.mutex);
+//        }
+//        else if (ITEM_get_cas(it) == ITEM_get_cas(old_it)) {
+//            // cas validates
+//            // it and old_it may belong to different classes.
+//            // I'm updating the stats for the one that's getting pushed out
+//            pthread_mutex_lock(&c->thread->stats.mutex);
+//            c->thread->stats.slab_stats[ITEM_clsid(old_it)].cas_hits++;
+//            pthread_mutex_unlock(&c->thread->stats.mutex);
+//
+//            STORAGE_delete(c->thread->storage, old_it);
+//            item_replace(old_it, it, hv);
+//            stored = STORED;
+//        } else {
+//            pthread_mutex_lock(&c->thread->stats.mutex);
+//            c->thread->stats.slab_stats[ITEM_clsid(old_it)].cas_badval++;
+//            pthread_mutex_unlock(&c->thread->stats.mutex);
+//
+//            if(settings.verbose > 1) {
+//                fprintf(stderr, "CAS:  failure: expected %llu, got %llu\n",
+//                        (unsigned long long)ITEM_get_cas(old_it),
+//                        (unsigned long long)ITEM_get_cas(it));
+//            }
+//            stored = EXISTS;
+//        }
+//    } else {
+//        int failed_alloc = 0;
+//        /*
+//         * Append - combine new and old record into single one. Here it's
+//         * atomic and thread-safe.
+//         */
+//        if (comm == NREAD_APPEND || comm == NREAD_PREPEND) {
+//            /*
+//             * Validate CAS
+//             */
+//            if (ITEM_get_cas(it) != 0) {
+//                // CAS much be equal
+//                if (ITEM_get_cas(it) != ITEM_get_cas(old_it)) {
+//                    stored = EXISTS;
+//                }
+//            }
+//#ifdef EXTSTORE
+//            if ((old_it->it_flags & ITEM_HDR) != 0) {
+//                /* block append/prepend from working with extstore-d items.
+//                 * also don't replace the header with the append chunk
+//                 * accidentally, so mark as a failed_alloc.
+//                 */
+//                failed_alloc = 1;
+//            } else
+//#endif
+//            if (stored == NOT_STORED) {
+//                /* we have it and old_it here - alloc memory to hold both */
+//                /* flags was already lost - so recover them from ITEM_suffix(it) */
+//                FLAGS_CONV(settings.inline_ascii_response, old_it, flags);
+//                new_it = do_item_alloc(key, it->nkey, flags, old_it->exptime, it->nbytes + old_it->nbytes - 2 /* CRLF */);
+//
+//                /* copy data from it and old_it to new_it */
+//                if (new_it == NULL || _store_item_copy_data(comm, old_it, new_it, it) == -1) {
+//                    failed_alloc = 1;
+//                    stored = NOT_STORED;
+//                    // failed data copy, free up.
+//                    if (new_it != NULL)
+//                        item_remove(new_it);
+//                } else {
+//                    it = new_it;
+//                }
+//            }
+//        }
+//
+//        if (stored == NOT_STORED && failed_alloc == 0) {
+//            if (old_it != NULL) {
+//                STORAGE_delete(c->thread->storage, old_it);
+//                item_replace(old_it, it, hv);
+//            } else {
+//                do_item_link(it, hv);
+//            }
+//
+//            c->cas = ITEM_get_cas(it);
+//
+//            stored = STORED;
+//        }
+//    }
+//
+//    if (old_it != NULL)
+//        do_item_remove(old_it);         /* release our reference */
+//    if (new_it != NULL)
+//        do_item_remove(new_it);
+//
+//    if (stored == STORED) {
+//        c->cas = ITEM_get_cas(it);
+//    }
+//    LOGGER_LOG(c->thread->l, LOG_MUTATIONS, LOGGER_ITEM_STORE, NULL,
+//            stored, comm, ITEM_key(it), it->nkey, it->exptime, ITEM_clsid(it));
+//
+//    return stored;
+
     char *key = ITEM_key(it);
-    item *old_it = do_item_get(key, it->nkey, hv, c, DONT_UPDATE);
-    enum store_item_type stored = NOT_STORED;
-
+    int ret;
+    item *old_it = NULL;
     item *new_it = NULL;
-    uint32_t flags;
+    //int stored = 0;
+    int flags;
 
-    if (old_it != NULL && comm == NREAD_ADD) {
-        /* add only adds a nonexistent item, but promote to head of LRU */
-        do_item_update(old_it);
-    } else if (!old_it && (comm == NREAD_REPLACE
-        || comm == NREAD_APPEND || comm == NREAD_PREPEND))
-    {
-        /* replace only replaces an existing value; don't store */
-    } else if (comm == NREAD_CAS) {
-        /* validate cas operation */
-        if(old_it == NULL) {
-            // LRU expired
-            stored = NOT_FOUND;
-            pthread_mutex_lock(&c->thread->stats.mutex);
-            c->thread->stats.cas_misses++;
-            pthread_mutex_unlock(&c->thread->stats.mutex);
+    if (comm == NREAD_ADD || comm == NREAD_REPLACE) {
+        ret = item_exists_bdb(key, strlen(key));
+        if ((ret == 0 && comm == NREAD_REPLACE) ||
+            (ret == 1 && comm == NREAD_ADD) ){
+            return 0;
         }
-        else if (ITEM_get_cas(it) == ITEM_get_cas(old_it)) {
-            // cas validates
-            // it and old_it may belong to different classes.
-            // I'm updating the stats for the one that's getting pushed out
-            pthread_mutex_lock(&c->thread->stats.mutex);
-            c->thread->stats.slab_stats[ITEM_clsid(old_it)].cas_hits++;
-            pthread_mutex_unlock(&c->thread->stats.mutex);
+    } else if (comm == NREAD_APPEND || comm == NREAD_PREPEND){
+        /* get orignal item */
+        old_it = item_get_bdb(key, strlen(key));
+        if (old_it == NULL){
+            return 0;
+        }
 
-            STORAGE_delete(c->thread->storage, old_it);
-            item_replace(old_it, it, hv);
-            stored = STORED;
+        /* we have it and old_it here - alloc memory to hold both */
+        /* flags was already lost - so recover them from ITEM_suffix(it) */
+        flags = (int) strtol(ITEM_suffix(old_it), (char **) NULL, 10);
+        new_it = item_alloc1_bdb(key, it->nkey, flags, it->nbytes + old_it->nbytes - 2 /* CRLF */);
+        if (new_it == NULL) {
+            /* SERVER_ERROR out of memory */
+            if (old_it != NULL)
+                item_free(old_it);
+            return 0;
+        }
+
+        /* copy data from it and old_it to new_it */
+        if (comm == NREAD_APPEND) {
+            memcpy(ITEM_data(new_it), ITEM_data(old_it), old_it->nbytes);
+            memcpy(ITEM_data(new_it) + old_it->nbytes - 2 /* CRLF */, ITEM_data(it), it->nbytes);
         } else {
-            pthread_mutex_lock(&c->thread->stats.mutex);
-            c->thread->stats.slab_stats[ITEM_clsid(old_it)].cas_badval++;
-            pthread_mutex_unlock(&c->thread->stats.mutex);
-
-            if(settings.verbose > 1) {
-                fprintf(stderr, "CAS:  failure: expected %llu, got %llu\n",
-                        (unsigned long long)ITEM_get_cas(old_it),
-                        (unsigned long long)ITEM_get_cas(it));
-            }
-            stored = EXISTS;
-        }
-    } else {
-        int failed_alloc = 0;
-        /*
-         * Append - combine new and old record into single one. Here it's
-         * atomic and thread-safe.
-         */
-        if (comm == NREAD_APPEND || comm == NREAD_PREPEND) {
-            /*
-             * Validate CAS
-             */
-            if (ITEM_get_cas(it) != 0) {
-                // CAS much be equal
-                if (ITEM_get_cas(it) != ITEM_get_cas(old_it)) {
-                    stored = EXISTS;
-                }
-            }
-#ifdef EXTSTORE
-            if ((old_it->it_flags & ITEM_HDR) != 0) {
-                /* block append/prepend from working with extstore-d items.
-                 * also don't replace the header with the append chunk
-                 * accidentally, so mark as a failed_alloc.
-                 */
-                failed_alloc = 1;
-            } else
-#endif
-            if (stored == NOT_STORED) {
-                /* we have it and old_it here - alloc memory to hold both */
-                /* flags was already lost - so recover them from ITEM_suffix(it) */
-                FLAGS_CONV(settings.inline_ascii_response, old_it, flags);
-                new_it = do_item_alloc(key, it->nkey, flags, old_it->exptime, it->nbytes + old_it->nbytes - 2 /* CRLF */);
-
-                /* copy data from it and old_it to new_it */
-                if (new_it == NULL || _store_item_copy_data(comm, old_it, new_it, it) == -1) {
-                    failed_alloc = 1;
-                    stored = NOT_STORED;
-                    // failed data copy, free up.
-                    if (new_it != NULL)
-                        item_remove(new_it);
-                } else {
-                    it = new_it;
-                }
-            }
+            /* NREAD_PREPEND */
+            memcpy(ITEM_data(new_it), ITEM_data(it), it->nbytes);
+            memcpy(ITEM_data(new_it) + it->nbytes - 2 /* CRLF */, ITEM_data(old_it), old_it->nbytes);
         }
 
-        if (stored == NOT_STORED && failed_alloc == 0) {
-            if (old_it != NULL) {
-                STORAGE_delete(c->thread->storage, old_it);
-                item_replace(old_it, it, hv);
-            } else {
-                do_item_link(it, hv);
-            }
-
-            c->cas = ITEM_get_cas(it);
-
-            stored = STORED;
-        }
+        it = new_it;
     }
+
+    ret = item_put_bdb(key, strlen(key), it);
 
     if (old_it != NULL)
-        do_item_remove(old_it);         /* release our reference */
+        item_free_bdb(old_it);
     if (new_it != NULL)
-        do_item_remove(new_it);
+        item_free_bdb(new_it);
 
-    if (stored == STORED) {
-        c->cas = ITEM_get_cas(it);
+    if (ret  == 0) {
+        return 1;
+    } else {
+        return 0;
     }
-    LOGGER_LOG(c->thread->l, LOG_MUTATIONS, LOGGER_ITEM_STORE, NULL,
-            stored, comm, ITEM_key(it), it->nkey, it->exptime, ITEM_clsid(it));
-
-    return stored;
 }
 
 typedef struct token_s {
