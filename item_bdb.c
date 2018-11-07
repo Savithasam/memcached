@@ -1,4 +1,4 @@
-#include "memcachedb.h"
+#include "memcached.h"
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -41,9 +41,9 @@ item *do_item_from_freelist_bdb(void) {
     } else {
         /* If malloc fails, let the logic fall through without spamming
          * STDERR on the server. */
-        s = (item *)malloc( settings.item_buf_size );
+        s = (item *)malloc( settings_bdb.item_buf_size );
         if (s != NULL){
-            memset(s, 0, settings.item_buf_size);
+            memset(s, 0, settings_bdb.item_buf_size);
         }
     }
 
@@ -100,23 +100,23 @@ item *item_alloc1_bdb(char *key, const size_t nkey, const int flags, const int n
     uint8_t nsuffix;
     item *it;
     char suffix[40];
-    size_t ntotal = item_make_header(nkey + 1, flags, nbytes, suffix, &nsuffix);
+    size_t ntotal = item_make_header_bdb(nkey + 1, flags, nbytes, suffix, &nsuffix);
 
-    if (ntotal > settings.item_buf_size){
+    if (ntotal > settings_bdb.item_buf_size){
         it = (item *)malloc(ntotal);
         if (it == NULL){
             return NULL;
         }
         memset(it, 0, ntotal);
-        if (settings.verbose > 1) {
+        if (settings_bdb.verbose > 1) {
             fprintf(stderr, "alloc a item buffer from malloc.\n");
         }
     }else{
-        it = item_from_freelist();
+        it = item_from_freelist_bdb();
         if (it == NULL){
             return NULL;
         }
-        if (settings.verbose > 1) {
+        if (settings_bdb.verbose > 1) {
             fprintf(stderr, "alloc a item buffer from freelist.\n");
         }
     }
@@ -134,21 +134,21 @@ item *item_alloc1_bdb(char *key, const size_t nkey, const int flags, const int n
  */
 item *item_alloc2_bdb(size_t ntotal) {
     item *it;
-    if (ntotal > settings.item_buf_size){
+    if (ntotal > settings_bdb.item_buf_size){
         it = (item *)malloc(ntotal);
         if (it == NULL){
             return NULL;
         }
         memset(it, 0, ntotal);
-        if (settings.verbose > 1) {
+        if (settings_bdb.verbose > 1) {
             fprintf(stderr, "alloc a item buffer from malloc.\n");
         }
     }else{
-        it = item_from_freelist();
+        it = item_from_freelist_bdb();
         if (it == NULL){
             return NULL;
         }
-        if (settings.verbose > 1) {
+        if (settings_bdb.verbose > 1) {
             fprintf(stderr, "alloc a item buffer from freelist.\n");
         }
     }
@@ -167,20 +167,20 @@ int item_free_bdb(item *it) {
 
     /* ntotal may be wrong, if 'it' is not a full item. */
     ntotal = ITEM_ntotal(it);
-    if (ntotal > settings.item_buf_size){
-        if (settings.verbose > 1) {
-            fprintf(stderr, "ntotal: %"PRIuS", use free() directly.\n", ntotal);
+    if (ntotal > settings_bdb.item_buf_size){
+        if (settings_bdb.verbose > 1) {
+            //fprintf(stderr, "ntotal: %"PRIuS", use free() directly.\n", ntotal);
         }
         free(it);
     }else{
-        if (0 != item_add_to_freelist(it)) {
-            if (settings.verbose > 1) {
-                fprintf(stderr, "ntotal: %"PRIuS", add a item buffer to freelist fail, use free() directly.\n", ntotal);
+        if (0 != item_add_to_freelist_bdb(it)) {
+            if (settings_bdb.verbose > 1) {
+//                fprintf(stderr, "ntotal: %"PRIuS", add a item buffer to freelist fail, use free() directly.\n", ntotal);
             }
             free(it);
         }else{
-            if (settings.verbose > 1) {
-                fprintf(stderr, "ntotal: %"PRIuS", add a item buffer to freelist.\n", ntotal);
+            if (settings_bdb.verbose > 1) {
+//                fprintf(stderr, "ntotal: %"PRIuS", add a item buffer to freelist.\n", ntotal);
             }
         }
     }
@@ -195,7 +195,7 @@ item *item_get_bdb(char *key, size_t nkey){
     int ret;
 
     /* first, alloc a fixed size */
-    it = item_alloc2(settings.item_buf_size);
+    it = item_alloc2_bdb(settings_bdb.item_buf_size);
     if (it == 0) {
         return NULL;
     }
@@ -203,7 +203,7 @@ item *item_get_bdb(char *key, size_t nkey){
     BDB_CLEANUP_DBT();
     dbkey.data = key;
     dbkey.size = nkey;
-    dbdata.ulen = settings.item_buf_size;
+    dbdata.ulen = settings_bdb.item_buf_size;
     dbdata.data = it;
     dbdata.flags = DB_DBT_USERMEM;
 
@@ -215,7 +215,7 @@ item *item_get_bdb(char *key, size_t nkey){
                 /* free the original smaller buffer */
                 item_free(it);
                 /* alloc the correct size */
-                it = item_alloc2(dbdata.size);
+                it = item_alloc2_bdb(dbdata.size);
                 if (it == NULL) {
                     return NULL;
                 }
@@ -236,7 +236,7 @@ item *item_get_bdb(char *key, size_t nkey){
                 stop = true;
                 item_free(it);
                 it = NULL;
-                if (settings.verbose > 1) {
+                if (settings_bdb.verbose > 1) {
                     fprintf(stderr, "dbp->get: %s\n", db_strerror(ret));
                 }
         }
@@ -251,7 +251,7 @@ item *item_cget_bdb(DBC *cursorp, char *start, size_t nstart, u_int32_t flags){
     int ret;
 
     /* first, alloc a fixed size */
-    it = item_alloc2(settings.item_buf_size);
+    it = item_alloc2_bdb(settings_bdb.item_buf_size);
     if (it == 0) {
         return NULL;
     }
@@ -262,7 +262,7 @@ item *item_cget_bdb(DBC *cursorp, char *start, size_t nstart, u_int32_t flags){
     dbkey.dlen = 0;
     dbkey.doff = 0;
     dbkey.flags = DB_DBT_PARTIAL;
-    dbdata.ulen = settings.item_buf_size;
+    dbdata.ulen = settings_bdb.item_buf_size;
     dbdata.data = it;
     dbdata.flags = DB_DBT_USERMEM;
 
@@ -271,13 +271,13 @@ item *item_cget_bdb(DBC *cursorp, char *start, size_t nstart, u_int32_t flags){
     while (!stop) {
         switch (ret = cursorp->get(cursorp, &dbkey, &dbdata, flags)) {
             case DB_BUFFER_SMALL:    /* user mem small */
-                if (settings.verbose > 1) {
+                if (settings_bdb.verbose > 1) {
                     fprintf(stderr, "cursorp->get: %s\n", db_strerror(ret));
                 }
                 /* free the original smaller buffer */
                 item_free(it);
                 /* alloc the correct size */
-                it = item_alloc2(dbdata.size);
+                it = item_alloc2_bdb(dbdata.size);
                 if (it == NULL) {
                     return NULL;
                 }
@@ -300,7 +300,7 @@ item *item_cget_bdb(DBC *cursorp, char *start, size_t nstart, u_int32_t flags){
                 stop = true;
                 item_free(it);
                 it = NULL;
-                if (settings.verbose > 1) {
+                if (settings_bdb.verbose > 1) {
                     fprintf(stderr, "cursorp->get: %s\n", db_strerror(ret));
                 }
         }
@@ -324,7 +324,7 @@ int item_put_bdb(char *key, size_t nkey, item *it){
     if (ret == 0) {
         return 0;
     } else {
-        if (settings.verbose > 1) {
+        if (settings_bdb.verbose > 1) {
             fprintf(stderr, "dbp->put: %s\n", db_strerror(ret));
         }
         return -1;
@@ -348,7 +348,7 @@ int item_delete_bdb(char *key, size_t nkey){
     }else if(ret == DB_NOTFOUND){
         return 1;
     }else{
-        if (settings.verbose > 1) {
+        if (settings_bdb.verbose > 1) {
             fprintf(stderr, "dbp->del: %s\n", db_strerror(ret));
         }
         return -1;

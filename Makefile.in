@@ -128,7 +128,7 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(pkgincludedir)"
 PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
-am__memcached_SOURCES_DIST = bdb.c memcached.c memcached.h hash.c \
+am__memcached_SOURCES_DIST = bdb.c item_bdb.c memcached.c memcached.h hash.c \
 	hash.h jenkins_hash.c jenkins_hash.h murmur3_hash.c \
 	murmur3_hash.h slabs.c slabs.h items.c items.h assoc.c assoc.h \
 	thread.c daemon.c stats.c stats.h util.c util.h trace.h \
@@ -151,6 +151,7 @@ am__memcached_SOURCES_DIST = bdb.c memcached.c memcached.h hash.c \
 @ENABLE_EXTSTORE_TRUE@	memcached-storage.$(OBJEXT) \
 @ENABLE_EXTSTORE_TRUE@	memcached-slab_automove_extstore.$(OBJEXT)
 am_memcached_OBJECTS = memcached-bdb.$(OBJEXT) \
+	memcached-item_bdb.$(OBJEXT) \
 	memcached-memcached.$(OBJEXT) memcached-hash.$(OBJEXT) \
 	memcached-jenkins_hash.$(OBJEXT) \
 	memcached-murmur3_hash.$(OBJEXT) memcached-slabs.$(OBJEXT) \
@@ -164,7 +165,7 @@ am_memcached_OBJECTS = memcached-bdb.$(OBJEXT) \
 	$(am__objects_5) $(am__objects_6)
 memcached_OBJECTS = $(am_memcached_OBJECTS)
 am__DEPENDENCIES_1 =
-am__memcached_debug_SOURCES_DIST = bdb.c memcached.c memcached.h \
+am__memcached_debug_SOURCES_DIST = bdb.c item_bdb.c memcached.c memcached.h \
 	hash.c hash.h jenkins_hash.c jenkins_hash.h murmur3_hash.c \
 	murmur3_hash.h slabs.c slabs.h items.c items.h assoc.c assoc.h \
 	thread.c daemon.c stats.c stats.h util.c util.h trace.h \
@@ -187,6 +188,7 @@ am__memcached_debug_SOURCES_DIST = bdb.c memcached.c memcached.h \
 @ENABLE_EXTSTORE_TRUE@	memcached_debug-storage.$(OBJEXT) \
 @ENABLE_EXTSTORE_TRUE@	memcached_debug-slab_automove_extstore.$(OBJEXT)
 am__objects_13 = memcached_debug-bdb.$(OBJEXT) \
+	memcached_debug-item_bdb.$(OBJEXT) \
 	memcached_debug-memcached.$(OBJEXT) \
 	memcached_debug-hash.$(OBJEXT) \
 	memcached_debug-jenkins_hash.$(OBJEXT) \
@@ -481,7 +483,7 @@ pkginclude_HEADERS = protocol_binary.h
 BUILT_SOURCES = $(am__append_10)
 testapp_SOURCES = testapp.c util.c util.h $(am__append_2)
 timedrun_SOURCES = timedrun.c
-memcached_SOURCES = bdb.c memcached.c memcached.h hash.c hash.h \
+memcached_SOURCES = bdb.c item_bdb.c memcached.c memcached.h hash.c hash.h \
 	jenkins_hash.c jenkins_hash.h murmur3_hash.c murmur3_hash.h \
 	slabs.c slabs.h items.c items.h assoc.c assoc.h thread.c \
 	daemon.c stats.c stats.h util.c util.h trace.h cache.h \
@@ -713,6 +715,20 @@ memcached-bdb.obj: bdb.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='bdb.c' object='memcached-bdb.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(memcached_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o memcached-bdb.obj `if test -f 'bdb.c'; then $(CYGPATH_W) 'bdb.c'; else $(CYGPATH_W) '$(srcdir)/bdb.c'; fi`
+
+memcached-item_bdb.o: item_bdb.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(memcached_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT memcached-item_bdb.o -MD -MP -MF $(DEPDIR)/memcached-item_bdb.Tpo -c -o memcached-item_bdb.o `test -f 'item_bdb.c' || echo '$(srcdir)/'`item_bdb.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/memcached-item_bdb.Tpo $(DEPDIR)/memcached-item_bdb.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='item_bdb.c' object='memcached-item_bdb.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(memcached_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o memcached-item_bdb.o `test -f 'item_bdb.c' || echo '$(srcdir)/'`item_bdb.c
+
+memcached-item_bdb.obj: item_bdb.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(memcached_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT memcached-item_bdb.obj -MD -MP -MF $(DEPDIR)/memcached-item_bdb.Tpo -c -o memcached-item_bdb.obj `if test -f 'item_bdb.c'; then $(CYGPATH_W) 'item_bdb.c'; else $(CYGPATH_W) '$(srcdir)/item_bdb.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/memcached-item_bdb.Tpo $(DEPDIR)/memcached-item_bdb.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='item_bdb.c' object='memcached-item_bdb.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(memcached_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o memcached-item_bdb.obj `if test -f 'item_bdb.c'; then $(CYGPATH_W) 'item_bdb.c'; else $(CYGPATH_W) '$(srcdir)/item_bdb.c'; fi`
 
 memcached-memcached.o: memcached.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(memcached_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT memcached-memcached.o -MD -MP -MF $(DEPDIR)/memcached-memcached.Tpo -c -o memcached-memcached.o `test -f 'memcached.c' || echo '$(srcdir)/'`memcached.c
@@ -1077,6 +1093,20 @@ memcached_debug-bdb.obj: bdb.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='bdb.c' object='memcached_debug-bdb.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(memcached_debug_CFLAGS) $(CFLAGS) -c -o memcached_debug-bdb.obj `if test -f 'bdb.c'; then $(CYGPATH_W) 'bdb.c'; else $(CYGPATH_W) '$(srcdir)/bdb.c'; fi`
+
+memcached_debug-item_bdb.o: item_bdb.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(memcached_debug_CFLAGS) $(CFLAGS) -MT memcached_debug-item_bdb.o -MD -MP -MF $(DEPDIR)/memcached_debug-item_bdb.Tpo -c -o memcached_debug-item_bdb.o `test -f 'item_bdb.c' || echo '$(srcdir)/'`item_bdb.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/memcached_debug-item_bdb.Tpo $(DEPDIR)/memcached_debug-item_bdb.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='item_bdb.c' object='memcached_debug-item_bdb.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(memcached_debug_CFLAGS) $(CFLAGS) -c -o memcached_debug-item_bdb.o `test -f 'item_bdb.c' || echo '$(srcdir)/'`item_bdb.c
+
+memcached_debug-item_bdb.obj: item_bdb.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(memcached_debug_CFLAGS) $(CFLAGS) -MT memcached_debug-item_bdb.obj -MD -MP -MF $(DEPDIR)/memcached_debug-item_bdb.Tpo -c -o memcached_debug-item_bdb.obj `if test -f 'item_bdb.c'; then $(CYGPATH_W) 'item_bdb.c'; else $(CYGPATH_W) '$(srcdir)/item_bdb.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/memcached_debug-item_bdb.Tpo $(DEPDIR)/memcached_debug-item_bdb.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='item_bdb.c' object='memcached_debug-item_bdb.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(memcached_debug_CFLAGS) $(CFLAGS) -c -o memcached_debug-item_bdb.obj `if test -f 'item_bdb.c'; then $(CYGPATH_W) 'item_bdb.c'; else $(CYGPATH_W) '$(srcdir)/item_bdb.c'; fi`
 
 memcached_debug-memcached.o: memcached.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(memcached_debug_CFLAGS) $(CFLAGS) -MT memcached_debug-memcached.o -MD -MP -MF $(DEPDIR)/memcached_debug-memcached.Tpo -c -o memcached_debug-memcached.o `test -f 'memcached.c' || echo '$(srcdir)/'`memcached.c

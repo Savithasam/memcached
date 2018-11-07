@@ -128,7 +128,7 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(pkgincludedir)"
 PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
-am__memcached_SOURCES_DIST = bdb.c memcached.c memcached.h hash.c \
+am__memcached_SOURCES_DIST = bdb.c item_bdb.c memcached.c memcached.h hash.c \
 	hash.h jenkins_hash.c jenkins_hash.h murmur3_hash.c \
 	murmur3_hash.h slabs.c slabs.h items.c items.h assoc.c assoc.h \
 	thread.c daemon.c stats.c stats.h util.c util.h trace.h \
@@ -151,6 +151,7 @@ am__objects_1 = memcached-cache.$(OBJEXT)
 #	memcached-storage.$(OBJEXT) \
 #	memcached-slab_automove_extstore.$(OBJEXT)
 am_memcached_OBJECTS = memcached-bdb.$(OBJEXT) \
+	memcached-item_bdb.$(OBJEXT) \
 	memcached-memcached.$(OBJEXT) memcached-hash.$(OBJEXT) \
 	memcached-jenkins_hash.$(OBJEXT) \
 	memcached-murmur3_hash.$(OBJEXT) memcached-slabs.$(OBJEXT) \
@@ -164,7 +165,7 @@ am_memcached_OBJECTS = memcached-bdb.$(OBJEXT) \
 	$(am__objects_5) $(am__objects_6)
 memcached_OBJECTS = $(am_memcached_OBJECTS)
 am__DEPENDENCIES_1 =
-am__memcached_debug_SOURCES_DIST = bdb.c memcached.c memcached.h \
+am__memcached_debug_SOURCES_DIST = bdb.c item_bdb.c memcached.c memcached.h \
 	hash.c hash.h jenkins_hash.c jenkins_hash.h murmur3_hash.c \
 	murmur3_hash.h slabs.c slabs.h items.c items.h assoc.c assoc.h \
 	thread.c daemon.c stats.c stats.h util.c util.h trace.h \
@@ -187,6 +188,7 @@ am__objects_7 = memcached_debug-cache.$(OBJEXT)
 #	memcached_debug-storage.$(OBJEXT) \
 #	memcached_debug-slab_automove_extstore.$(OBJEXT)
 am__objects_13 = memcached_debug-bdb.$(OBJEXT) \
+	memcached_debug-item_bdb.$(OBJEXT) \
 	memcached_debug-memcached.$(OBJEXT) \
 	memcached_debug-hash.$(OBJEXT) \
 	memcached_debug-jenkins_hash.$(OBJEXT) \
@@ -373,12 +375,12 @@ distuninstallcheck_listfiles = find . -type f -print
 am__distuninstallcheck_listfiles = $(distuninstallcheck_listfiles) \
   | sed 's|^\./|$(prefix)/|' | grep -v '$(infodir)/dir$$'
 distcleancheck_listfiles = find . -type f -print
-ACLOCAL = ${SHELL} /home/savitha/memcached/missing aclocal-1.15
+ACLOCAL = ${SHELL} /home/madhupriya/Documents/550/project/memcached/missing aclocal-1.15
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 1
-AUTOCONF = ${SHELL} /home/savitha/memcached/missing autoconf
-AUTOHEADER = ${SHELL} /home/savitha/memcached/missing autoheader
-AUTOMAKE = ${SHELL} /home/savitha/memcached/missing automake-1.15
+AUTOCONF = ${SHELL} /home/madhupriya/Documents/550/project/memcached/missing autoconf
+AUTOHEADER = ${SHELL} /home/madhupriya/Documents/550/project/memcached/missing autoheader
+AUTOMAKE = ${SHELL} /home/madhupriya/Documents/550/project/memcached/missing automake-1.15
 AWK = mawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
@@ -406,7 +408,7 @@ LDFLAGS =
 LIBOBJS = 
 LIBS = -levent -ldb 
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /home/savitha/memcached/missing makeinfo
+MAKEINFO = ${SHELL} /home/madhupriya/Documents/550/project/memcached/missing makeinfo
 MKDIR_P = /bin/mkdir -p
 OBJEXT = o
 PACKAGE = memcached
@@ -426,10 +428,10 @@ STRIP =
 VERSION = 1.5.10
 XML2RFC = no
 XSLTPROC = no
-abs_builddir = /home/savitha/memcached
-abs_srcdir = /home/savitha/memcached
-abs_top_builddir = /home/savitha/memcached
-abs_top_srcdir = /home/savitha/memcached
+abs_builddir = /home/madhupriya/Documents/550/project/memcached
+abs_srcdir = /home/madhupriya/Documents/550/project/memcached
+abs_top_builddir = /home/madhupriya/Documents/550/project/memcached
+abs_top_srcdir = /home/madhupriya/Documents/550/project/memcached
 ac_ct_CC = gcc
 am__include = include
 am__leading_dot = .
@@ -456,7 +458,7 @@ host_vendor = pc
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/savitha/memcached/install-sh
+install_sh = ${SHELL} /home/madhupriya/Documents/550/project/memcached/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -481,7 +483,7 @@ pkginclude_HEADERS = protocol_binary.h
 BUILT_SOURCES = $(am__append_10)
 testapp_SOURCES = testapp.c util.c util.h $(am__append_2)
 timedrun_SOURCES = timedrun.c
-memcached_SOURCES = bdb.c memcached.c memcached.h hash.c hash.h \
+memcached_SOURCES = bdb.c item_bdb.c memcached.c memcached.h hash.c hash.h \
 	jenkins_hash.c jenkins_hash.h murmur3_hash.c murmur3_hash.h \
 	slabs.c slabs.h items.c items.h assoc.c assoc.h thread.c \
 	daemon.c stats.c stats.h util.c util.h trace.h cache.h \
@@ -713,6 +715,20 @@ memcached-bdb.obj: bdb.c
 #	$(AM_V_CC)source='bdb.c' object='memcached-bdb.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
 #	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(memcached_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o memcached-bdb.obj `if test -f 'bdb.c'; then $(CYGPATH_W) 'bdb.c'; else $(CYGPATH_W) '$(srcdir)/bdb.c'; fi`
+
+memcached-item_bdb.o: item_bdb.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(memcached_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT memcached-item_bdb.o -MD -MP -MF $(DEPDIR)/memcached-item_bdb.Tpo -c -o memcached-item_bdb.o `test -f 'item_bdb.c' || echo '$(srcdir)/'`item_bdb.c
+	$(AM_V_at)$(am__mv) $(DEPDIR)/memcached-item_bdb.Tpo $(DEPDIR)/memcached-item_bdb.Po
+#	$(AM_V_CC)source='item_bdb.c' object='memcached-item_bdb.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(memcached_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o memcached-item_bdb.o `test -f 'item_bdb.c' || echo '$(srcdir)/'`item_bdb.c
+
+memcached-item_bdb.obj: item_bdb.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(memcached_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT memcached-item_bdb.obj -MD -MP -MF $(DEPDIR)/memcached-item_bdb.Tpo -c -o memcached-item_bdb.obj `if test -f 'item_bdb.c'; then $(CYGPATH_W) 'item_bdb.c'; else $(CYGPATH_W) '$(srcdir)/item_bdb.c'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/memcached-item_bdb.Tpo $(DEPDIR)/memcached-item_bdb.Po
+#	$(AM_V_CC)source='item_bdb.c' object='memcached-item_bdb.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(memcached_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o memcached-item_bdb.obj `if test -f 'item_bdb.c'; then $(CYGPATH_W) 'item_bdb.c'; else $(CYGPATH_W) '$(srcdir)/item_bdb.c'; fi`
 
 memcached-memcached.o: memcached.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(memcached_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT memcached-memcached.o -MD -MP -MF $(DEPDIR)/memcached-memcached.Tpo -c -o memcached-memcached.o `test -f 'memcached.c' || echo '$(srcdir)/'`memcached.c
@@ -1077,6 +1093,20 @@ memcached_debug-bdb.obj: bdb.c
 #	$(AM_V_CC)source='bdb.c' object='memcached_debug-bdb.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
 #	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(memcached_debug_CFLAGS) $(CFLAGS) -c -o memcached_debug-bdb.obj `if test -f 'bdb.c'; then $(CYGPATH_W) 'bdb.c'; else $(CYGPATH_W) '$(srcdir)/bdb.c'; fi`
+
+memcached_debug-item_bdb.o: item_bdb.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(memcached_debug_CFLAGS) $(CFLAGS) -MT memcached_debug-item_bdb.o -MD -MP -MF $(DEPDIR)/memcached_debug-item_bdb.Tpo -c -o memcached_debug-item_bdb.o `test -f 'item_bdb.c' || echo '$(srcdir)/'`item_bdb.c
+	$(AM_V_at)$(am__mv) $(DEPDIR)/memcached_debug-item_bdb.Tpo $(DEPDIR)/memcached_debug-item_bdb.Po
+#	$(AM_V_CC)source='item_bdb.c' object='memcached_debug-item_bdb.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(memcached_debug_CFLAGS) $(CFLAGS) -c -o memcached_debug-item_bdb.o `test -f 'item_bdb.c' || echo '$(srcdir)/'`item_bdb.c
+
+memcached_debug-item_bdb.obj: item_bdb.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(memcached_debug_CFLAGS) $(CFLAGS) -MT memcached_debug-item_bdb.obj -MD -MP -MF $(DEPDIR)/memcached_debug-item_bdb.Tpo -c -o memcached_debug-item_bdb.obj `if test -f 'item_bdb.c'; then $(CYGPATH_W) 'item_bdb.c'; else $(CYGPATH_W) '$(srcdir)/item_bdb.c'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/memcached_debug-item_bdb.Tpo $(DEPDIR)/memcached_debug-item_bdb.Po
+#	$(AM_V_CC)source='item_bdb.c' object='memcached_debug-item_bdb.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(memcached_debug_CFLAGS) $(CFLAGS) -c -o memcached_debug-item_bdb.obj `if test -f 'item_bdb.c'; then $(CYGPATH_W) 'item_bdb.c'; else $(CYGPATH_W) '$(srcdir)/item_bdb.c'; fi`
 
 memcached_debug-memcached.o: memcached.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(memcached_debug_CFLAGS) $(CFLAGS) -MT memcached_debug-memcached.o -MD -MP -MF $(DEPDIR)/memcached_debug-memcached.Tpo -c -o memcached_debug-memcached.o `test -f 'memcached.c' || echo '$(srcdir)/'`memcached.c

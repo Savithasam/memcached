@@ -37,7 +37,7 @@
 /** bdb specific changes */
 #include <db.h>
 #define DBFILE "data.db"
-#define DBHOME "/data1/memcachedb"
+#define DBHOME "/home/memcachedb"
 #define BDB_EID_SELF -3
 
 /**
@@ -68,6 +68,19 @@ typedef struct _stritem {
     /* then " flags length\r\n" (no terminating null) */
     /* then data with terminating \r\n (no terminating null; it's binary!) */
 } item;
+
+struct settings_bdb {
+    size_t item_buf_size;
+    int maxconns;
+    int port;
+    int udpport;
+    char *inter;
+    int verbose;
+    char socketpath;   /* path to unix socket if using local socket */
+    int access;  /* access mask (a la chmod) for unix domain socket */
+    int num_threads;        /* number of libevent threads to run */
+};
+extern struct settings_bdb settings_bdb;
 
 struct bdb_version {
     int majver;
@@ -135,6 +148,9 @@ extern struct bdb_settings bdb_settings;
 extern struct bdb_version bdb_version;
 
 /* bdb management */
+
+
+
 void bdb_settings_init(void);
 void bdb_env_init(void);
 void bdb_db_open(void);
@@ -922,3 +938,6 @@ int item_put_bdb(char *key, size_t nkey, item *it);
 int item_delete_bdb(char *key, size_t nkey);
 int item_exists_bdb(char *key, size_t nkey);
 item *item_cget_bdb(DBC *cursorp, char *start, size_t nstart, u_int32_t flags);
+
+# define item_from_freelist_bdb()         do_item_from_freelist_bdb()
+# define item_add_to_freelist_bdb(x)      do_item_add_to_freelist_bdb(x)
